@@ -28,7 +28,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 3. INYECCIÓN DE CSS (DARK MODE & MÓVIL OPTIMIZADO)
+# 3. INYECCIÓN DE CSS (DARK MODE & MÓVIL)
 # ==========================================
 st.markdown("""
 <style>
@@ -37,13 +37,13 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* Maximizar área táctil en teléfonos y aprovechar todo el ancho en móvil */
+    /* Maximizar área táctil en teléfonos */
     .block-container {
-        padding-top: 0.8rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 0.4rem !important;
-        padding-right: 0.4rem !important;
-        max-width: 100% !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        max-width: 740px !important;
     }
 
     /* Fondo oscuro principal */
@@ -95,10 +95,10 @@ st.markdown("""
         background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
         border-radius: 12px;
-        padding: 10px 8px;
+        padding: 10px 12px;
         margin-bottom: 10px;
         text-align: center;
-        min-height: 75px;
+        min-height: 80px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -108,23 +108,21 @@ st.markdown("""
         background: linear-gradient(135deg, #0F2744 0%, #0F172A 100%);
         border: 1.5px solid #38BDF8;
         border-radius: 12px;
-        padding: 12px 10px;
+        padding: 12px 14px;
         margin: 4px auto 14px auto;
         text-align: center;
-        max-width: 100%;
+        max-width: 420px;
     }
 
-    /* TÍTULOS DE KPIS: Blanco más oscuro (#CBD5E1) para máxima legibilidad */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.74rem;
-        color: #CBD5E1 !important;
-        font-weight: 700;
+        font-size: 0.72rem;
+        color: #94A3B8;
+        font-weight: 600;
         text-transform: uppercase;
-        line-height: 1.15;
-        letter-spacing: 0.01em;
+        line-height: 1.1;
     }
     .kpi-card .value, .kpi-card-centered .value {
-        font-size: 1.3rem;
+        font-size: 1.28rem;
         font-weight: 800;
         margin-top: 4px;
         line-height: 1.2;
@@ -143,7 +141,7 @@ st.markdown("""
         background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
         border: 2px solid #00E676;
         border-radius: 16px;
-        padding: 16px 14px;
+        padding: 18px 20px;
         margin-top: 16px;
         margin-bottom: 18px;
         text-align: center;
@@ -177,16 +175,16 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* Media query para óptima experiencia en teléfonos móviles */
-    @media (max-width: 600px) {
+    /* Media query para móviles pequeños */
+    @media (max-width: 480px) {
         .kpi-highlight .kpi-value {
-            font-size: 1.85rem;
+            font-size: 1.8rem;
         }
         .kpi-highlight .kpi-sub {
             font-size: 0.82rem !important;
         }
         .kpi-card .value, .kpi-card-centered .value {
-            font-size: 1.12rem;
+            font-size: 1.1rem;
         }
         .kpi-card .title, .kpi-card-centered .title {
             font-size: 0.68rem;
