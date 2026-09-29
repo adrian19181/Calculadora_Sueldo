@@ -217,10 +217,10 @@ st.markdown("""
         background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
         border-radius: 8px;
-        padding: 6px 3px;
+        padding: 8px 4px;
         margin-bottom: 6px;
         text-align: center;
-        min-height: 60px;
+        min-height: 65px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -229,27 +229,27 @@ st.markdown("""
     .kpi-card-centered {
         background: linear-gradient(135deg, #0F2744 0%, #0F172A 100%);
         border: 1.5px solid #38BDF8;
-        border-radius: 8px;
-        padding: 8px 6px;
-        margin: 4px auto 6px auto;
+        border-radius: 10px;
+        padding: 12px 8px;
+        margin: 6px auto 8px auto;
         text-align: center;
         width: 100%;
     }
 
-    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) */
+    /* TÍTULOS DE KPIS: Blanco Puro (#FFFFFF) más grandes y destacados */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.63rem;
-        color: #CBD5E1 !important;
+        font-size: 0.78rem;
+        color: #FFFFFF !important;
         font-weight: 700;
         text-transform: uppercase;
-        line-height: 1.1;
-        letter-spacing: 0.01em;
+        line-height: 1.25;
+        letter-spacing: 0.02em;
     }
     .kpi-card .value, .kpi-card-centered .value {
-        font-size: 1.1rem;
-        font-weight: 800;
-        margin-top: 2px;
-        line-height: 1.15;
+        font-size: 1.35rem;
+        font-weight: 900;
+        margin-top: 4px;
+        line-height: 1.2;
     }
 
     /* Colores para KPIs */
@@ -595,10 +595,10 @@ with tab1:
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=-0.3,
+            y=-0.35,
             xanchor="center",
             x=0.5,
-            font=dict(color="#FAFAFA", size=9)
+            font=dict(color="#FFFFFF", size=12)
         ),
         font=dict(color="#FAFAFA")
     )
