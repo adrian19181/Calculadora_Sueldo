@@ -76,30 +76,36 @@ def reset_fields():
 init_states()
 
 # ==========================================
-# 4. INYECCIÓN DE CSS COMPACTO SIN DESPLAZAMIENTO HORIZONTAL
+# 4. INYECCIÓN DE CSS (AJUSTE ESTRICTO DE 2 COLUMNAS Y CERO SCROLL HORIZONTAL)
 # ==========================================
 st.markdown("""
 <style>
-    /* Ocultar header nativo pero mantener margen para evitar solapamiento con controles de Streamlit Cloud */
+    /* Reset de box-sizing global */
+    *, *:before, *:after {
+        box-sizing: border-box !important;
+    }
+
+    /* Ocultar header nativo y evitar bloqueos */
     [data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 100 !important;
     }
     
-    /* Prevenir cualquier scroll horizontal en pantalla */
-    html, body, .stApp, [data-testid="stAppViewContainer"] {
+    /* Bloqueo absoluto de scroll horizontal */
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         overflow-x: hidden !important;
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 100vw !important;
     }
 
-    /* Ajustar área principal en móviles */
+    /* Ajustar área principal */
     .block-container {
         padding-top: 1.8rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 0.25rem !important;
-        padding-right: 0.25rem !important;
+        padding-left: 0.1rem !important;
+        padding-right: 0.1rem !important;
         max-width: 100% !important;
+        width: 100% !important;
     }
 
     /* OCULTAR BOTONES (+ / -) Y FLECHAS DE INPUTS NUMÉRICOS */
@@ -115,11 +121,12 @@ st.markdown("""
     input[type=number] {
         -moz-appearance: textfield !important;
         text-align: center !important;
-        padding: 4px 6px !important;
-        font-size: 0.88rem !important;
+        padding: 4px 2px !important;
+        font-size: 0.85rem !important;
+        width: 100% !important;
     }
 
-    /* COMPRIMIR INPUTS Y REDUCIR ANCHO MÍNIMO INTERNO DE STREAMLIT */
+    /* COMPRIMIR CONTENEDORES DE INPUTS */
     div[data-testid="stNumberInput"], 
     div[data-baseweb="input"],
     div[data-baseweb="base-input"] {
@@ -131,27 +138,31 @@ st.markdown("""
         border-radius: 6px !important;
     }
 
-    /* FORZAR 2 COLUMNAS COMPACTAS AJUSTADAS EXACTAMENTE AL ANCHO DEL MÓVIL */
+    /* FORZAR 2 COLUMNAS ESTRICTAS DEL 48.5% CADA UNA (TOTAL 100% CON GAP DE 3%) */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 0.3rem !important;
+        justify-content: space-between !important;
+        gap: 3% !important;
         width: 100% !important;
         max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
     
     [data-testid="column"] {
-        flex: 1 1 50% !important;
-        width: 50% !important;
-        max-width: 50% !important;
+        flex: 0 0 48.5% !important;
+        width: 48.5% !important;
+        max-width: 48.5% !important;
         min-width: 0 !important;
         overflow: hidden !important;
+        padding: 0 !important;
     }
 
-    /* LABELS COMPACTAS SIN DESBORDAMIENTO */
+    /* LABELS COMPACTAS CON RECORTES LIMPIOS SI EXCEDEN */
     div[data-testid="stWidgetLabel"] label p {
-        font-size: 0.74rem !important;
+        font-size: 0.72rem !important;
         font-weight: 600 !important;
         color: #CBD5E1 !important;
         white-space: nowrap !important;
@@ -160,12 +171,12 @@ st.markdown("""
         margin-bottom: 2px !important;
     }
 
-    /* BOTONES COMPACTOS DE CABECERA */
+    /* BOTONES DE CABECERA COMPACTOS */
     .stButton > button {
-        padding: 0.35rem 0.2rem !important;
-        font-size: 0.78rem !important;
+        padding: 0.3rem 0.1rem !important;
+        font-size: 0.75rem !important;
         font-weight: 700 !important;
-        border-radius: 8px !important;
+        border-radius: 6px !important;
     }
 
     /* Fondo oscuro principal */
@@ -177,7 +188,7 @@ st.markdown("""
     /* Títulos de sección */
     .section-title-ingresos {
         color: #00E676;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         font-weight: 700;
         margin-bottom: 6px;
         display: flex;
@@ -189,7 +200,7 @@ st.markdown("""
 
     .section-title-egresos {
         color: #F472B6;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         font-weight: 700;
         margin-bottom: 6px;
         display: flex;
@@ -201,7 +212,7 @@ st.markdown("""
 
     .section-title-kpis {
         color: #38BDF8;
-        font-size: 0.88rem;
+        font-size: 0.85rem;
         font-weight: 700;
         margin-top: 10px;
         margin-bottom: 6px;
@@ -217,20 +228,21 @@ st.markdown("""
         background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
         border-radius: 8px;
-        padding: 6px 3px;
+        padding: 6px 2px;
         margin-bottom: 6px;
         text-align: center;
-        min-height: 60px;
+        min-height: 58px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        width: 100%;
     }
     
     .kpi-card-centered {
         background: linear-gradient(135deg, #0F2744 0%, #0F172A 100%);
         border: 1.5px solid #38BDF8;
         border-radius: 8px;
-        padding: 8px 6px;
+        padding: 8px 4px;
         margin: 4px auto 6px auto;
         text-align: center;
         width: 100%;
@@ -238,7 +250,7 @@ st.markdown("""
 
     /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.63rem;
+        font-size: 0.62rem;
         color: #CBD5E1 !important;
         font-weight: 700;
         text-transform: uppercase;
@@ -246,7 +258,7 @@ st.markdown("""
         letter-spacing: 0.01em;
     }
     .kpi-card .value, .kpi-card-centered .value {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 800;
         margin-top: 2px;
         line-height: 1.15;
@@ -265,7 +277,7 @@ st.markdown("""
         background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
         border: 2px solid #00E676;
         border-radius: 12px;
-        padding: 10px 8px;
+        padding: 10px 6px;
         margin-top: 10px;
         margin-bottom: 12px;
         text-align: center;
@@ -273,19 +285,19 @@ st.markdown("""
     }
     .kpi-highlight .kpi-title {
         color: #A7F3D0;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
         letter-spacing: 0.05em;
     }
     .kpi-highlight .kpi-value {
         color: #00E676;
-        font-size: 1.75rem;
+        font-size: 1.7rem;
         font-weight: 900;
         line-height: 1.2;
     }
     .kpi-highlight .kpi-sub {
         color: #FFFFFF !important;
-        font-size: 0.78rem !important;
+        font-size: 0.75rem !important;
         font-weight: 600 !important;
         margin-top: 3px;
     }
@@ -318,8 +330,8 @@ document.addEventListener('click', function(e) {
 # ==========================================
 # 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
 # ==========================================
-st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.75rem; margin-bottom: 8px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.2rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.72rem; margin-bottom: 8px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
 
 col_btn1, col_btn2 = st.columns(2)
 with col_btn1:
