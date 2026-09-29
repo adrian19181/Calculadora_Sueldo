@@ -76,25 +76,33 @@ def reset_fields():
 init_states()
 
 # ==========================================
-# 4. INYECCIÓN DE CSS (100% MÓVIL OPTIMIZADO + OCULTAR +/-)
+# 4. INYECCIÓN DE CSS COMPACTO SIN DESPLAZAMIENTO HORIZONTAL
 # ==========================================
 st.markdown("""
 <style>
-    /* Ocultar header nativo de Streamlit */
+    /* Ocultar header nativo pero mantener margen para evitar solapamiento con controles de Streamlit Cloud */
     [data-testid="stHeader"] {
         background-color: transparent !important;
+        z-index: 100 !important;
     }
     
-    /* Maximizar área en móvil */
-    .block-container {
-        padding-top: 0.5rem !important;
-        padding-bottom: 2rem !important;
-        padding-left: 0.2rem !important;
-        padding-right: 0.2rem !important;
+    /* Prevenir cualquier scroll horizontal en pantalla */
+    html, body, .stApp, [data-testid="stAppViewContainer"] {
+        overflow-x: hidden !important;
+        width: 100% !important;
         max-width: 100% !important;
     }
 
-    /* OCULTAR BOTONES DE INCREMENTO/DECREMENTO (+ / -) Y FLECHAS DE INPUT */
+    /* Ajustar área principal en móviles */
+    .block-container {
+        padding-top: 1.8rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+        max-width: 100% !important;
+    }
+
+    /* OCULTAR BOTONES (+ / -) Y FLECHAS DE INPUTS NUMÉRICOS */
     button[data-testid="stNumberInputStepDown"],
     button[data-testid="stNumberInputStepUp"] {
         display: none !important;
@@ -107,20 +115,57 @@ st.markdown("""
     input[type=number] {
         -moz-appearance: textfield !important;
         text-align: center !important;
+        padding: 4px 6px !important;
+        font-size: 0.88rem !important;
     }
 
-    /* FORZAR 2 COLUMNAS LADO A LADO EN MÓVIL SIN OVERFLOW */
+    /* COMPRIMIR INPUTS Y REDUCIR ANCHO MÍNIMO INTERNO DE STREAMLIT */
+    div[data-testid="stNumberInput"], 
+    div[data-baseweb="input"],
+    div[data-baseweb="base-input"] {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        background-color: #0F172A !important;
+        border-color: #334155 !important;
+        border-radius: 6px !important;
+    }
+
+    /* FORZAR 2 COLUMNAS COMPACTAS AJUSTADAS EXACTAMENTE AL ANCHO DEL MÓVIL */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 0.3rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     [data-testid="column"] {
-        flex: 1 1 0% !important;
+        flex: 1 1 50% !important;
         width: 50% !important;
+        max-width: 50% !important;
         min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* LABELS COMPACTAS SIN DESBORDAMIENTO */
+    div[data-testid="stWidgetLabel"] label p {
+        font-size: 0.74rem !important;
+        font-weight: 600 !important;
+        color: #CBD5E1 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* BOTONES COMPACTOS DE CABECERA */
+    .stButton > button {
+        padding: 0.35rem 0.2rem !important;
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
     }
 
     /* Fondo oscuro principal */
@@ -132,37 +177,37 @@ st.markdown("""
     /* Títulos de sección */
     .section-title-ingresos {
         color: #00E676;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         border-bottom: 1px solid #334155;
         padding-bottom: 4px;
     }
 
     .section-title-egresos {
         color: #F472B6;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         border-bottom: 1px solid #334155;
         padding-bottom: 4px;
     }
 
     .section-title-kpis {
         color: #38BDF8;
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         font-weight: 700;
-        margin-top: 12px;
-        margin-bottom: 8px;
+        margin-top: 10px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         border-bottom: 1px solid #334155;
         padding-bottom: 4px;
     }
@@ -171,11 +216,11 @@ st.markdown("""
     .kpi-card {
         background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
-        border-radius: 10px;
-        padding: 8px 4px;
+        border-radius: 8px;
+        padding: 6px 3px;
         margin-bottom: 6px;
         text-align: center;
-        min-height: 65px;
+        min-height: 60px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -184,16 +229,16 @@ st.markdown("""
     .kpi-card-centered {
         background: linear-gradient(135deg, #0F2744 0%, #0F172A 100%);
         border: 1.5px solid #38BDF8;
-        border-radius: 10px;
-        padding: 10px 8px;
-        margin: 4px auto 8px auto;
+        border-radius: 8px;
+        padding: 8px 6px;
+        margin: 4px auto 6px auto;
         text-align: center;
         width: 100%;
     }
 
-    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) para máxima legibilidad */
+    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.65rem;
+        font-size: 0.63rem;
         color: #CBD5E1 !important;
         font-weight: 700;
         text-transform: uppercase;
@@ -201,10 +246,10 @@ st.markdown("""
         letter-spacing: 0.01em;
     }
     .kpi-card .value, .kpi-card-centered .value {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         font-weight: 800;
-        margin-top: 3px;
-        line-height: 1.2;
+        margin-top: 2px;
+        line-height: 1.15;
     }
 
     /* Colores para KPIs */
@@ -219,45 +264,30 @@ st.markdown("""
     .kpi-highlight {
         background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
         border: 2px solid #00E676;
-        border-radius: 14px;
-        padding: 12px 10px;
-        margin-top: 12px;
-        margin-bottom: 14px;
+        border-radius: 12px;
+        padding: 10px 8px;
+        margin-top: 10px;
+        margin-bottom: 12px;
         text-align: center;
-        box-shadow: 0 8px 16px rgba(0, 230, 118, 0.2);
+        box-shadow: 0 6px 14px rgba(0, 230, 118, 0.2);
     }
     .kpi-highlight .kpi-title {
         color: #A7F3D0;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.05em;
     }
     .kpi-highlight .kpi-value {
         color: #00E676;
-        font-size: 1.85rem;
+        font-size: 1.75rem;
         font-weight: 900;
         line-height: 1.2;
     }
     .kpi-highlight .kpi-sub {
         color: #FFFFFF !important;
-        font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        margin-top: 4px;
-    }
-
-    /* Estilo de inputs */
-    div[data-baseweb="input"] {
-        background-color: #0F172A !important;
-        border-color: #334155 !important;
-        border-radius: 8px !important;
-        color: #FFFFFF !important;
-    }
-
-    /* Labels de inputs más compactas para móvil */
-    div[data-testid="stWidgetLabel"] label p {
         font-size: 0.78rem !important;
         font-weight: 600 !important;
-        color: #CBD5E1 !important;
+        margin-top: 3px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -288,8 +318,8 @@ document.addEventListener('click', function(e) {
 # ==========================================
 # 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
 # ==========================================
-st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.3rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.78rem; margin-bottom: 10px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.75rem; margin-bottom: 8px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
 
 col_btn1, col_btn2 = st.columns(2)
 with col_btn1:
