@@ -76,7 +76,7 @@ def reset_fields():
 init_states()
 
 # ==========================================
-# 4. INYECCIÓN DE CSS (MANTENER COLUMNAS EN MÓVIL)
+# 4. INYECCIÓN DE CSS (100% MÓVIL OPTIMIZADO + OCULTAR +/-)
 # ==========================================
 st.markdown("""
 <style>
@@ -89,22 +89,37 @@ st.markdown("""
     .block-container {
         padding-top: 0.5rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 0.3rem !important;
-        padding-right: 0.3rem !important;
+        padding-left: 0.2rem !important;
+        padding-right: 0.2rem !important;
         max-width: 100% !important;
     }
 
-    /* FORZAR COLUMNAS LADO A LADO EN MÓVIL (EVITAR APILAMIENTO EN 1 SOLA COLUMNA) */
+    /* OCULTAR BOTONES DE INCREMENTO/DECREMENTO (+ / -) Y FLECHAS DE INPUT */
+    button[data-testid="stNumberInputStepDown"],
+    button[data-testid="stNumberInputStepUp"] {
+        display: none !important;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none !important;
+        margin: 0 !important;
+    }
+    input[type=number] {
+        -moz-appearance: textfield !important;
+        text-align: center !important;
+    }
+
+    /* FORZAR 2 COLUMNAS LADO A LADO EN MÓVIL SIN OVERFLOW */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 0.4rem !important;
+        gap: 0.3rem !important;
     }
     
     [data-testid="column"] {
         flex: 1 1 0% !important;
-        width: 100% !important;
+        width: 50% !important;
         min-width: 0 !important;
     }
 
@@ -117,7 +132,7 @@ st.markdown("""
     /* Títulos de sección */
     .section-title-ingresos {
         color: #00E676;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 700;
         margin-bottom: 8px;
         display: flex;
@@ -129,7 +144,7 @@ st.markdown("""
 
     .section-title-egresos {
         color: #F472B6;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 700;
         margin-bottom: 8px;
         display: flex;
@@ -141,10 +156,10 @@ st.markdown("""
 
     .section-title-kpis {
         color: #38BDF8;
-        font-size: 0.98rem;
+        font-size: 0.92rem;
         font-weight: 700;
         margin-top: 12px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -158,9 +173,9 @@ st.markdown("""
         border: 1px solid #334155;
         border-radius: 10px;
         padding: 8px 4px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         text-align: center;
-        min-height: 70px;
+        min-height: 65px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -171,14 +186,14 @@ st.markdown("""
         border: 1.5px solid #38BDF8;
         border-radius: 10px;
         padding: 10px 8px;
-        margin: 4px auto 10px auto;
+        margin: 4px auto 8px auto;
         text-align: center;
         width: 100%;
     }
 
-    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) */
+    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) para máxima legibilidad */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         color: #CBD5E1 !important;
         font-weight: 700;
         text-transform: uppercase;
@@ -205,27 +220,27 @@ st.markdown("""
         background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
         border: 2px solid #00E676;
         border-radius: 14px;
-        padding: 14px 12px;
-        margin-top: 14px;
-        margin-bottom: 16px;
+        padding: 12px 10px;
+        margin-top: 12px;
+        margin-bottom: 14px;
         text-align: center;
         box-shadow: 0 8px 16px rgba(0, 230, 118, 0.2);
     }
     .kpi-highlight .kpi-title {
         color: #A7F3D0;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 0.05em;
     }
     .kpi-highlight .kpi-value {
         color: #00E676;
-        font-size: 2rem;
+        font-size: 1.85rem;
         font-weight: 900;
         line-height: 1.2;
     }
     .kpi-highlight .kpi-sub {
         color: #FFFFFF !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         font-weight: 600 !important;
         margin-top: 4px;
     }
@@ -238,17 +253,11 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* Ajuste en móvil */
-    @media (max-width: 600px) {
-        .kpi-card .title, .kpi-card-centered .title {
-            font-size: 0.62rem;
-        }
-        .kpi-card .value, .kpi-card-centered .value {
-            font-size: 1.05rem;
-        }
-        .kpi-highlight .kpi-value {
-            font-size: 1.7rem;
-        }
+    /* Labels de inputs más compactas para móvil */
+    div[data-testid="stWidgetLabel"] label p {
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        color: #CBD5E1 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -279,8 +288,8 @@ document.addEventListener('click', function(e) {
 # ==========================================
 # 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
 # ==========================================
-st.markdown("<h2 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px;'>🧮 Calculadora de Sueldo</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.82rem; margin-bottom: 12px;'>Simulador Interactivo de Rol de Pagos (Ecuador)</p>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.3rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.78rem; margin-bottom: 10px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
 
 col_btn1, col_btn2 = st.columns(2)
 with col_btn1:
@@ -301,13 +310,13 @@ st.markdown('<div class="section-title-ingresos">🟢 1. RECUADRO DE INGRESOS</d
 
 col_i1, col_i2 = st.columns(2)
 with col_i1:
-    sueldo_mensual = st.number_input("Sueldo Mensual Base ($)", min_value=0.0, key="sueldo_mensual", step=50.0, format="%.2f")
-    hrs_50 = st.number_input("Horas Suplementarias (50%)", min_value=0.0, key="hrs_50", step=1.0, format="%.1f")
-    bonos = st.number_input("Bonos / Bonificaciones ($)", min_value=0.0, key="bonos", step=5.0, format="%.2f")
+    sueldo_mensual = st.number_input("Sueldo Base ($)", min_value=0.0, key="sueldo_mensual", step=50.0, format="%.2f")
+    hrs_50 = st.number_input("Horas Sup. (50%)", min_value=0.0, key="hrs_50", step=1.0, format="%.1f")
+    bonos = st.number_input("Bonos ($)", min_value=0.0, key="bonos", step=5.0, format="%.2f")
 
 with col_i2:
-    dias_trabajados = st.number_input("Días Trabajados", min_value=1, max_value=30, key="dias_trabajados", step=1)
-    hrs_100 = st.number_input("Horas Extraordinarias (100%)", min_value=0.0, key="hrs_100", step=1.0, format="%.1f")
+    dias_trabajados = st.number_input("Días Trab.", min_value=1, max_value=30, key="dias_trabajados", step=1)
+    hrs_100 = st.number_input("Horas Ext. (100%)", min_value=0.0, key="hrs_100", step=1.0, format="%.1f")
     comisiones = st.number_input("Comisiones ($)", min_value=0.0, key="comisiones", step=5.0, format="%.2f")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -319,37 +328,36 @@ st.markdown('<div class="section-title-egresos">🔴 2. RECUADRO DE EGRESOS Y DE
 
 col_e1, col_e2 = st.columns(2)
 with col_e1:
-    prestamo_quiro = st.number_input("Préstamo Quirografario ($)", min_value=0.0, key="prestamo_quiro", step=10.0, format="%.2f")
-    prestamo_hipo = st.number_input("Préstamo Hipotecario ($)", min_value=0.0, key="prestamo_hipo", step=10.0, format="%.2f")
-    hrs_descontar = st.number_input("Horas a Descontar (#)", min_value=0.0, key="hrs_descontar", step=1.0, format="%.1f")
+    prestamo_quiro = st.number_input("Prést. Quirografario ($)", min_value=0.0, key="prestamo_quiro", step=10.0, format="%.2f")
+    prestamo_hipo = st.number_input("Prést. Hipotecario ($)", min_value=0.0, key="prestamo_hipo", step=10.0, format="%.2f")
+    hrs_descontar = st.number_input("Horas Descontar (#)", min_value=0.0, key="hrs_descontar", step=1.0, format="%.1f")
 
 with col_e2:
     multas = st.number_input("Multas ($)", min_value=0.0, key="multas", step=5.0, format="%.2f")
     atrasos = st.number_input("Atrasos ($)", min_value=0.0, key="atrasos", step=5.0, format="%.2f")
-    imp_renta = st.number_input("Impuesto a la Renta ($)", min_value=0.0, key="imp_renta", step=5.0, format="%.2f")
+    imp_renta = st.number_input("Imp. Renta ($)", min_value=0.0, key="imp_renta", step=5.0, format="%.2f")
 
 # Opcionales de Egresos adicionales
 with st.expander("➕ Otros Descuentos Opcionales (Cesantía, Anticipos, Consumos)"):
     col_e3, col_e4 = st.columns(2)
     with col_e3:
-        usar_cesantia_auto = st.checkbox("Calcular Cesantía IESS (2%) Automática", value=True)
-        cesantia_manual = st.number_input("Cesantía ($) (Si no es automática)", min_value=0.0, key="cesantia_manual", step=5.0, format="%.2f")
-        anticipos = st.number_input("Anticipos de Bono / Sueldo ($)", min_value=0.0, key="anticipos", step=5.0)
+        usar_cesantia_auto = st.checkbox("Cesantía IESS (2%) Auto.", value=True)
+        cesantia_manual = st.number_input("Cesantía ($)", min_value=0.0, key="cesantia_manual", step=5.0, format="%.2f")
+        anticipos = st.number_input("Anticipos ($)", min_value=0.0, key="anticipos", step=5.0)
     with col_e4:
-        consumos = st.number_input("Consumo de Empleados ($)", min_value=0.0, key="consumos", step=5.0)
-        pension_alim = st.number_input("Pensión Alimenticia ($)", min_value=0.0, key="pension_alim", step=10.0)
-        ext_salud = st.number_input("Extensión de Salud IESS ($)", min_value=0.0, key="ext_salud", step=5.0)
+        consumos = st.number_input("Consumos ($)", min_value=0.0, key="consumos", step=5.0)
+        pension_alim = st.number_input("Pensión Alim. ($)", min_value=0.0, key="pension_alim", step=10.0)
+        ext_salud = st.number_input("Ext. Salud ($)", min_value=0.0, key="ext_salud", step=5.0)
 
 # Beneficios opcionales (Décimos)
 with st.expander("🎁 Beneficios de Ley (Mensualización de Décimos y F. Reserva)"):
-    col_b1, col_b2, col_b3 = st.columns(3)
+    col_b1, col_b2 = st.columns(2)
     with col_b1:
         mensualizar_13 = st.checkbox("XIII Mensual", value=True)
+        mensualizar_fr = st.checkbox("F. Reserva (8.33%)", value=True)
     with col_b2:
         mensualizar_14 = st.checkbox("XIV Mensual", value=True)
-    with col_b3:
-        mensualizar_fr = st.checkbox("Fondos Reserva (8.33%)", value=True)
-    sbu_valor = st.number_input("Salario Básico Unificado (SBU)", value=482.0, step=1.0)
+        sbu_valor = st.number_input("SBU ($)", value=482.0, step=1.0)
 
 # ==========================================
 # 9. MOTOR DE CÁLCULO FINANCIERO Y FÓRMULAS
@@ -389,7 +397,7 @@ total_egresos = iess_945 + cesantia + otros_egresos_sum
 total_a_pagar = total_ingresos - total_egresos
 
 # ==========================================
-# 10. RESUMEN DE KPIS REORGANIZADOS
+# 10. RESUMEN DE KPIS ORGANIZADOS EN 2 COLUMNAS EN MÓVIL
 # ==========================================
 st.markdown("---")
 
@@ -412,32 +420,26 @@ with k_col2:
     </div>
     """, unsafe_allow_html=True)
 
-k_col3, k_col4, k_col5 = st.columns(3)
+k_col3, k_col4 = st.columns(2)
 with k_col3:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="title">Valor Suplementarias (50%)</div>
+        <div class="title">Suplementarias (50%)</div>
         <div class="value text-teal">${val_sup:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 with k_col4:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="title">Valor Extraordinarias (100%)</div>
+        <div class="title">Extraordinarias (100%)</div>
         <div class="value text-teal">${val_ext:,.2f}</div>
-    </div>
-    """, unsafe_allow_html=True)
-with k_col5:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="title">Valor Total Horas</div>
-        <div class="value text-blue">${total_he:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="kpi-card-centered">
-    <div class="title">Total Ingresos Gravables (Sueldo + HE + Bonos + Comisiones)</div>
+    <div class="title">Valor Total Horas Extras: <span class="text-blue">${total_he:,.2f}</span></div>
+    <div class="title" style="margin-top:6px;">Total Ingresos Gravables (Sueldo + HE + Bonos + Comisiones)</div>
     <div class="value text-blue">${ingresos_gravables:,.2f}</div>
 </div>
 """, unsafe_allow_html=True)
@@ -445,26 +447,35 @@ st.markdown(f"""
 # --- BLOQUE 2: BENEFICIOS DE LEY ---
 st.markdown('<div class="section-title-kpis">🎁 2. BENEFICIOS DE LEY</div>', unsafe_allow_html=True)
 
-k_col6, k_col7, k_col8 = st.columns(3)
-with k_col6:
+k_col5, k_col6 = st.columns(2)
+with k_col5:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="title">F. Reserva Mensual (8.33%)</div>
+        <div class="title">F. Reserva (8.33%)</div>
         <div class="value text-purple">${val_fr:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
-with k_col7:
+with k_col6:
     st.markdown(f"""
     <div class="kpi-card">
         <div class="title">XIII Mensual</div>
         <div class="value text-amber">${val_xiii:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
-with k_col8:
+
+k_col7, k_col8 = st.columns(2)
+with k_col7:
     st.markdown(f"""
     <div class="kpi-card">
         <div class="title">XIV Mensual</div>
         <div class="value text-amber">${val_xiv:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+with k_col8:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="title">Total Beneficios</div>
+        <div class="value text-green">${total_beneficios:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -478,7 +489,7 @@ st.markdown(f"""
 # --- BLOQUE 3: APORTACIONES Y EGRESOS ---
 st.markdown('<div class="section-title-kpis">🔻 3. APORTACIONES Y EGRESOS</div>', unsafe_allow_html=True)
 
-k_col9, k_col10, k_col11 = st.columns(3)
+k_col9, k_col10 = st.columns(2)
 with k_col9:
     st.markdown(f"""
     <div class="kpi-card">
@@ -493,10 +504,11 @@ with k_col10:
         <div class="value text-rose">${cesantia:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
-with k_col11:
+
+if otros_egresos_sum > 0:
     st.markdown(f"""
-    <div class="kpi-card">
-        <div class="title">Otros Egresos</div>
+    <div class="kpi-card-centered" style="border-color: #F472B6;">
+        <div class="title">Otros Egresos y Descuentos</div>
         <div class="value text-rose">${otros_egresos_sum:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -506,22 +518,22 @@ st.markdown(f"""
 <div class="kpi-highlight">
     <div class="kpi-title">💵 TOTAL NETO A RECIBIR</div>
     <div class="kpi-value">${total_a_pagar:,.2f}</div>
-    <div class="kpi-sub">Total Ingresos: ${total_ingresos:,.2f} | Total Egresos: ${total_egresos:,.2f}</div>
+    <div class="kpi-sub">Ingresos: ${total_ingresos:,.2f} | Egresos: ${total_egresos:,.2f}</div>
 </div>
 """, unsafe_allow_html=True)
 
 # ==========================================
 # 11. GRÁFICO Y TABLA DETALLADA
 # ==========================================
-tab1, tab2 = st.tabs(["📊 Distribución de Ingresos y Descuentos", "📄 Detalle Rol de Pagos"])
+tab1, tab2 = st.tabs(["📊 Distribución", "📄 Detalle Rol"])
 
 with tab1:
-    labels_chart = ["Total Neto a Recibir", "Aporte IESS (9.45%)"]
+    labels_chart = ["Neto a Recibir", "IESS (9.45%)"]
     values_chart = [max(0.0, total_a_pagar), iess_945]
     colors_chart = ["#00E676", "#F472B6"]
     
     if (cesantia + otros_egresos_sum) > 0:
-        labels_chart.append("Otros Egresos / Descuentos")
+        labels_chart.append("Otros Egresos")
         values_chart.append(cesantia + otros_egresos_sum)
         colors_chart.append("#FBBF24")
 
@@ -542,22 +554,21 @@ with tab1:
     
     fig.update_layout(
         title=dict(
-            text=f"<b>📊 Porcentaje de Ingresos Retenido por el IESS</b><br><span style='font-size:0.78rem; color:#94A3B8;'>El IESS 9.45% se lleva el <b>{pct_iess_real:.2f}%</b> de tus ingresos totales (${iess_945:,.2f} de ${total_ingresos:,.2f})</span>",
-            font=dict(color="#38BDF8", size=14),
+            text=f"<b>📊 Retención IESS: {pct_iess_real:.2f}%</b><br><span style='font-size:0.75rem; color:#94A3B8;'>${iess_945:,.2f} de ${total_ingresos:,.2f}</span>",
+            font=dict(color="#38BDF8", size=13),
             x=0.5,
             xanchor="center"
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(t=65, b=40, l=10, r=10),
+        margin=dict(t=50, b=30, l=5, r=5),
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=-0.28,
+            y=-0.3,
             xanchor="center",
             x=0.5,
-            title=dict(text="💡 Leyenda (Clic para ocultar/filtrar):", font=dict(color="#FAFAFA", size=11)),
-            font=dict(color="#FAFAFA", size=10)
+            font=dict(color="#FAFAFA", size=9)
         ),
         font=dict(color="#FAFAFA")
     )
@@ -568,35 +579,32 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 with tab2:
-    col_t1, col_t2 = st.columns(2)
-    with col_t1:
-        st.markdown("<h4 style='color: #00E676;'>🟢 Ingresos</h4>", unsafe_allow_html=True)
-        df_i = pd.DataFrame([
-            {"Concepto": f"Sueldo Ganado ({dias_trabajados}d)", "Valor ($)": sueldo_ganado},
-            {"Concepto": f"Horas Sup. 50% ({hrs_50}h)", "Valor ($)": val_sup},
-            {"Concepto": f"Horas Ext. 100% ({hrs_100}h)", "Valor ($)": val_ext},
-            {"Concepto": "Bonos / Bonificaciones", "Valor ($)": bonos},
-            {"Concepto": "Comisiones", "Valor ($)": comisiones},
-            {"Concepto": "(-) Descuento Horas", "Valor ($)": -val_descuento_horas},
-            {"Concepto": "TOTAL INGRESOS GRAVABLES", "Valor ($)": ingresos_gravables},
-            {"Concepto": "XIII Mensual", "Valor ($)": val_xiii},
-            {"Concepto": "XIV Mensual", "Valor ($)": val_xiv},
-            {"Concepto": "Fondos de Reserva (8.33%)", "Valor ($)": val_fr},
-            {"Concepto": "TOTAL INGRESOS", "Valor ($)": total_ingresos},
-        ])
-        st.dataframe(df_i.style.format({"Valor ($)": "${:,.2f}"}), use_container_width=True, hide_index=True)
+    st.markdown("<h5 style='color: #00E676;'>🟢 Ingresos</h5>", unsafe_allow_html=True)
+    df_i = pd.DataFrame([
+        {"Concepto": f"Sueldo Ganado ({dias_trabajados}d)", "Valor ($)": sueldo_ganado},
+        {"Concepto": f"Horas Sup. 50% ({hrs_50}h)", "Valor ($)": val_sup},
+        {"Concepto": f"Horas Ext. 100% ({hrs_100}h)", "Valor ($)": val_ext},
+        {"Concepto": "Bonos / Bonificaciones", "Valor ($)": bonos},
+        {"Concepto": "Comisiones", "Valor ($)": comisiones},
+        {"Concepto": "(-) Descuento Horas", "Valor ($)": -val_descuento_horas},
+        {"Concepto": "TOTAL INGRESOS GRAVABLES", "Valor ($)": ingresos_gravables},
+        {"Concepto": "XIII Mensual", "Valor ($)": val_xiii},
+        {"Concepto": "XIV Mensual", "Valor ($)": val_xiv},
+        {"Concepto": "Fondos de Reserva (8.33%)", "Valor ($)": val_fr},
+        {"Concepto": "TOTAL INGRESOS", "Valor ($)": total_ingresos},
+    ])
+    st.dataframe(df_i.style.format({"Valor ($)": "${:,.2f}"}), use_container_width=True, hide_index=True)
 
-    with col_t2:
-        st.markdown("<h4 style='color: #F472B6;'>🔴 Egresos</h4>", unsafe_allow_html=True)
-        df_e = pd.DataFrame([
-            {"Concepto": "Aporte IESS 9.45%", "Valor ($)": iess_945},
-            {"Concepto": "Cesantía (2%)", "Valor ($)": cesantia},
-            {"Concepto": "Préstamo Quirografario", "Valor ($)": prestamo_quiro},
-            {"Concepto": "Préstamo Hipotecario", "Valor ($)": prestamo_hipo},
-            {"Concepto": "Multas", "Valor ($)": multas},
-            {"Concepto": "Atrasos", "Valor ($)": atrasos},
-            {"Concepto": "Impuesto a la Renta", "Valor ($)": imp_renta},
-            {"Concepto": "Otros (Anticipos/Consumos/Salud)", "Valor ($)": anticipos + consumos + pension_alim + ext_salud},
-            {"Concepto": "TOTAL EGRESOS", "Valor ($)": total_egresos},
-        ])
-        st.dataframe(df_e.style.format({"Valor ($)": "${:,.2f}"}), use_container_width=True, hide_index=True)
+    st.markdown("<h5 style='color: #F472B6;'>🔴 Egresos</h5>", unsafe_allow_html=True)
+    df_e = pd.DataFrame([
+        {"Concepto": "Aporte IESS 9.45%", "Valor ($)": iess_945},
+        {"Concepto": "Cesantía (2%)", "Valor ($)": cesantia},
+        {"Concepto": "Préstamo Quirografario", "Valor ($)": prestamo_quiro},
+        {"Concepto": "Préstamo Hipotecario", "Valor ($)": prestamo_hipo},
+        {"Concepto": "Multas", "Valor ($)": multas},
+        {"Concepto": "Atrasos", "Valor ($)": atrasos},
+        {"Concepto": "Impuesto a la Renta", "Valor ($)": imp_renta},
+        {"Concepto": "Otros (Anticipos/Consumos/Salud)", "Valor ($)": anticipos + consumos + pension_alim + ext_salud},
+        {"Concepto": "TOTAL EGRESOS", "Valor ($)": total_egresos},
+    ])
+    st.dataframe(df_e.style.format({"Valor ($)": "${:,.2f}"}), use_container_width=True, hide_index=True)
