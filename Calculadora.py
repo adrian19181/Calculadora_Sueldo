@@ -12,9 +12,9 @@ if __name__ == "__main__":
         subprocess.run([sys.executable, "-m", "streamlit", "run", file_path])
         sys.exit(0)
 
-# Importaciones principales
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 import streamlit.components.v1 as components
 
 # ==========================================
@@ -28,7 +28,55 @@ st.set_page_config(
 )
 
 # ==========================================
-# 3. INYECCIÓN DE CSS (DARK MODE & MÓVIL OPTIMIZADO)
+# 3. MANEJO DE ESTADO (RESET / VALORES INICIALES)
+# ==========================================
+def init_states():
+    defaults = {
+        "sueldo_mensual": 900.0,
+        "dias_trabajados": 30,
+        "hrs_50": 0.0,
+        "hrs_100": 0.0,
+        "bonos": 0.0,
+        "comisiones": 0.0,
+        "prestamo_quiro": 0.0,
+        "prestamo_hipo": 0.0,
+        "hrs_descontar": 0.0,
+        "multas": 0.0,
+        "atrasos": 0.0,
+        "imp_renta": 0.0,
+        "cesantia_manual": 0.0,
+        "anticipos": 0.0,
+        "consumos": 0.0,
+        "pension_alim": 0.0,
+        "ext_salud": 0.0,
+    }
+    for key, val in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = val
+
+def reset_fields():
+    st.session_state["sueldo_mensual"] = 900.0
+    st.session_state["dias_trabajados"] = 30
+    st.session_state["hrs_50"] = 0.0
+    st.session_state["hrs_100"] = 0.0
+    st.session_state["bonos"] = 0.0
+    st.session_state["comisiones"] = 0.0
+    st.session_state["prestamo_quiro"] = 0.0
+    st.session_state["prestamo_hipo"] = 0.0
+    st.session_state["hrs_descontar"] = 0.0
+    st.session_state["multas"] = 0.0
+    st.session_state["atrasos"] = 0.0
+    st.session_state["imp_renta"] = 0.0
+    st.session_state["cesantia_manual"] = 0.0
+    st.session_state["anticipos"] = 0.0
+    st.session_state["consumos"] = 0.0
+    st.session_state["pension_alim"] = 0.0
+    st.session_state["ext_salud"] = 0.0
+
+init_states()
+
+# ==========================================
+# 4. INYECCIÓN DE CSS (MANTENER COLUMNAS EN MÓVIL)
 # ==========================================
 st.markdown("""
 <style>
@@ -37,13 +85,27 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* Maximizar área táctil en teléfonos y aprovechar todo el ancho en móvil */
+    /* Maximizar área en móvil */
     .block-container {
-        padding-top: 0.8rem !important;
+        padding-top: 0.5rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 0.4rem !important;
-        padding-right: 0.4rem !important;
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
         max-width: 100% !important;
+    }
+
+    /* FORZAR COLUMNAS LADO A LADO EN MÓVIL (EVITAR APILAMIENTO EN 1 SOLA COLUMNA) */
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 0.4rem !important;
+    }
+    
+    [data-testid="column"] {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 
     /* Fondo oscuro principal */
@@ -55,37 +117,37 @@ st.markdown("""
     /* Títulos de sección */
     .section-title-ingresos {
         color: #00E676;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         border-bottom: 1px solid #334155;
-        padding-bottom: 6px;
+        padding-bottom: 4px;
     }
 
     .section-title-egresos {
         color: #F472B6;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         border-bottom: 1px solid #334155;
-        padding-bottom: 6px;
+        padding-bottom: 4px;
     }
 
     .section-title-kpis {
         color: #38BDF8;
-        font-size: 1.05rem;
+        font-size: 0.98rem;
         font-weight: 700;
-        margin-top: 14px;
-        margin-bottom: 12px;
+        margin-top: 12px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         border-bottom: 1px solid #334155;
         padding-bottom: 4px;
     }
@@ -94,11 +156,11 @@ st.markdown("""
     .kpi-card {
         background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
         border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 10px 8px;
-        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 8px 4px;
+        margin-bottom: 8px;
         text-align: center;
-        min-height: 75px;
+        min-height: 70px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -107,26 +169,26 @@ st.markdown("""
     .kpi-card-centered {
         background: linear-gradient(135deg, #0F2744 0%, #0F172A 100%);
         border: 1.5px solid #38BDF8;
-        border-radius: 12px;
-        padding: 12px 10px;
-        margin: 4px auto 14px auto;
+        border-radius: 10px;
+        padding: 10px 8px;
+        margin: 4px auto 10px auto;
         text-align: center;
-        max-width: 100%;
+        width: 100%;
     }
 
-    /* TÍTULOS DE KPIS: Blanco más oscuro (#CBD5E1) para máxima legibilidad */
+    /* TÍTULOS DE KPIS: Blanco claro (#CBD5E1) */
     .kpi-card .title, .kpi-card-centered .title {
-        font-size: 0.74rem;
+        font-size: 0.68rem;
         color: #CBD5E1 !important;
         font-weight: 700;
         text-transform: uppercase;
-        line-height: 1.15;
+        line-height: 1.1;
         letter-spacing: 0.01em;
     }
     .kpi-card .value, .kpi-card-centered .value {
-        font-size: 1.3rem;
+        font-size: 1.15rem;
         font-weight: 800;
-        margin-top: 4px;
+        margin-top: 3px;
         line-height: 1.2;
     }
 
@@ -142,34 +204,33 @@ st.markdown("""
     .kpi-highlight {
         background: linear-gradient(135deg, #064E3B 0%, #022C22 100%);
         border: 2px solid #00E676;
-        border-radius: 16px;
-        padding: 16px 14px;
-        margin-top: 16px;
-        margin-bottom: 18px;
+        border-radius: 14px;
+        padding: 14px 12px;
+        margin-top: 14px;
+        margin-bottom: 16px;
         text-align: center;
-        box-shadow: 0 10px 20px rgba(0, 230, 118, 0.2);
+        box-shadow: 0 8px 16px rgba(0, 230, 118, 0.2);
     }
     .kpi-highlight .kpi-title {
         color: #A7F3D0;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 700;
         letter-spacing: 0.05em;
     }
     .kpi-highlight .kpi-value {
         color: #00E676;
-        font-size: 2.3rem;
+        font-size: 2rem;
         font-weight: 900;
         line-height: 1.2;
     }
     .kpi-highlight .kpi-sub {
         color: #FFFFFF !important;
-        font-size: 0.95rem !important;
+        font-size: 0.85rem !important;
         font-weight: 600 !important;
-        margin-top: 6px;
-        letter-spacing: 0.02em;
+        margin-top: 4px;
     }
 
-    /* Estilo de inputs en Streamlit */
+    /* Estilo de inputs */
     div[data-baseweb="input"] {
         background-color: #0F172A !important;
         border-color: #334155 !important;
@@ -177,26 +238,23 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* Media query para óptima experiencia en teléfonos móviles */
+    /* Ajuste en móvil */
     @media (max-width: 600px) {
-        .kpi-highlight .kpi-value {
-            font-size: 1.85rem;
-        }
-        .kpi-highlight .kpi-sub {
-            font-size: 0.82rem !important;
+        .kpi-card .title, .kpi-card-centered .title {
+            font-size: 0.62rem;
         }
         .kpi-card .value, .kpi-card-centered .value {
-            font-size: 1.12rem;
+            font-size: 1.05rem;
         }
-        .kpi-card .title, .kpi-card-centered .title {
-            font-size: 0.68rem;
+        .kpi-highlight .kpi-value {
+            font-size: 1.7rem;
         }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 4. FIX PARCHE MÓVIL (POPOVER / DROPDOWNS)
+# 5. FIX PARCHE MÓVIL (POPOVER / DROPDOWNS)
 # ==========================================
 components.html("""
 <script>
@@ -219,56 +277,68 @@ document.addEventListener('click', function(e) {
 """, height=0, width=0)
 
 # ==========================================
-# 5. ENCABEZADO
+# 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
 # ==========================================
 st.markdown("<h2 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px;'>🧮 Calculadora de Sueldo</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.85rem; margin-bottom: 20px;'>Simulador Interactivo de Rol de Pagos (Normativa Ecuador)</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.82rem; margin-bottom: 12px;'>Simulador Interactivo de Rol de Pagos (Ecuador)</p>", unsafe_allow_html=True)
+
+col_btn1, col_btn2 = st.columns(2)
+with col_btn1:
+    if st.button("🔄 Refrescar", use_container_width=True):
+        st.rerun()
+
+with col_btn2:
+    if st.button("🧹 Reset / Limpiar", use_container_width=True):
+        reset_fields()
+        st.rerun()
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ==========================================
-# 6. SECCIÓN 1: RECUADRO DE INGRESOS
+# 7. SECCIÓN 1: RECUADRO DE INGRESOS
 # ==========================================
 st.markdown('<div class="section-title-ingresos">🟢 1. RECUADRO DE INGRESOS</div>', unsafe_allow_html=True)
 
 col_i1, col_i2 = st.columns(2)
 with col_i1:
-    sueldo_mensual = st.number_input("Sueldo Mensual Base ($)", min_value=0.0, value=900.0, step=50.0, format="%.2f")
-    hrs_50 = st.number_input("Horas Suplementarias (50%)", min_value=0.0, value=10.0, step=1.0, format="%.1f")
-    bonos = st.number_input("Bonos / Bonificaciones ($)", min_value=0.0, value=85.73, step=5.0, format="%.2f")
+    sueldo_mensual = st.number_input("Sueldo Mensual Base ($)", min_value=0.0, key="sueldo_mensual", step=50.0, format="%.2f")
+    hrs_50 = st.number_input("Horas Suplementarias (50%)", min_value=0.0, key="hrs_50", step=1.0, format="%.1f")
+    bonos = st.number_input("Bonos / Bonificaciones ($)", min_value=0.0, key="bonos", step=5.0, format="%.2f")
 
 with col_i2:
-    dias_trabajados = st.number_input("Días Trabajados", min_value=1, max_value=30, value=30, step=1)
-    hrs_100 = st.number_input("Horas Extraordinarias (100%)", min_value=0.0, value=0.0, step=1.0, format="%.1f")
-    comisiones = st.number_input("Comisiones ($)", min_value=0.0, value=0.0, step=5.0, format="%.2f")
+    dias_trabajados = st.number_input("Días Trabajados", min_value=1, max_value=30, key="dias_trabajados", step=1)
+    hrs_100 = st.number_input("Horas Extraordinarias (100%)", min_value=0.0, key="hrs_100", step=1.0, format="%.1f")
+    comisiones = st.number_input("Comisiones ($)", min_value=0.0, key="comisiones", step=5.0, format="%.2f")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==========================================
-# 7. SECCIÓN 2: RECUADRO DE EGRESOS Y DESCUENTOS
+# 8. SECCIÓN 2: RECUADRO DE EGRESOS Y DESCUENTOS
 # ==========================================
 st.markdown('<div class="section-title-egresos">🔴 2. RECUADRO DE EGRESOS Y DESCUENTOS</div>', unsafe_allow_html=True)
 
 col_e1, col_e2 = st.columns(2)
 with col_e1:
-    prestamo_quiro = st.number_input("Préstamo Quirografario ($)", min_value=0.0, value=0.0, step=10.0, format="%.2f")
-    prestamo_hipo = st.number_input("Préstamo Hipotecario ($)", min_value=0.0, value=0.0, step=10.0, format="%.2f")
-    hrs_descontar = st.number_input("Horas a Descontar (#)", min_value=0.0, value=0.0, step=1.0, format="%.1f")
+    prestamo_quiro = st.number_input("Préstamo Quirografario ($)", min_value=0.0, key="prestamo_quiro", step=10.0, format="%.2f")
+    prestamo_hipo = st.number_input("Préstamo Hipotecario ($)", min_value=0.0, key="prestamo_hipo", step=10.0, format="%.2f")
+    hrs_descontar = st.number_input("Horas a Descontar (#)", min_value=0.0, key="hrs_descontar", step=1.0, format="%.1f")
 
 with col_e2:
-    multas = st.number_input("Multas ($)", min_value=0.0, value=0.0, step=5.0, format="%.2f")
-    atrasos = st.number_input("Atrasos ($)", min_value=0.0, value=0.0, step=5.0, format="%.2f")
-    imp_renta = st.number_input("Impuesto a la Renta ($)", min_value=0.0, value=0.0, step=5.0, format="%.2f")
+    multas = st.number_input("Multas ($)", min_value=0.0, key="multas", step=5.0, format="%.2f")
+    atrasos = st.number_input("Atrasos ($)", min_value=0.0, key="atrasos", step=5.0, format="%.2f")
+    imp_renta = st.number_input("Impuesto a la Renta ($)", min_value=0.0, key="imp_renta", step=5.0, format="%.2f")
 
 # Opcionales de Egresos adicionales
 with st.expander("➕ Otros Descuentos Opcionales (Cesantía, Anticipos, Consumos)"):
     col_e3, col_e4 = st.columns(2)
     with col_e3:
         usar_cesantia_auto = st.checkbox("Calcular Cesantía IESS (2%) Automática", value=True)
-        cesantia_manual = st.number_input("Cesantía ($) (Si no es automática)", min_value=0.0, value=0.0, step=5.0, format="%.2f")
-        anticipos = st.number_input("Anticipos de Bono / Sueldo ($)", min_value=0.0, value=0.0, step=5.0)
+        cesantia_manual = st.number_input("Cesantía ($) (Si no es automática)", min_value=0.0, key="cesantia_manual", step=5.0, format="%.2f")
+        anticipos = st.number_input("Anticipos de Bono / Sueldo ($)", min_value=0.0, key="anticipos", step=5.0)
     with col_e4:
-        consumos = st.number_input("Consumo de Empleados ($)", min_value=0.0, value=0.0, step=5.0)
-        pension_alim = st.number_input("Pensión Alimenticia ($)", min_value=0.0, value=0.0, step=10.0)
-        ext_salud = st.number_input("Extensión de Salud IESS ($)", min_value=0.0, value=0.0, step=5.0)
+        consumos = st.number_input("Consumo de Empleados ($)", min_value=0.0, key="consumos", step=5.0)
+        pension_alim = st.number_input("Pensión Alimenticia ($)", min_value=0.0, key="pension_alim", step=10.0)
+        ext_salud = st.number_input("Extensión de Salud IESS ($)", min_value=0.0, key="ext_salud", step=5.0)
 
 # Beneficios opcionales (Décimos)
 with st.expander("🎁 Beneficios de Ley (Mensualización de Décimos y F. Reserva)"):
@@ -282,11 +352,11 @@ with st.expander("🎁 Beneficios de Ley (Mensualización de Décimos y F. Reser
     sbu_valor = st.number_input("Salario Básico Unificado (SBU)", value=482.0, step=1.0)
 
 # ==========================================
-# 8. MOTOR DE CÁLCULO FINANCIERO Y FÓRMULAS
+# 9. MOTOR DE CÁLCULO FINANCIERO Y FÓRMULAS
 # ==========================================
 val_hora_norm = sueldo_mensual / 240.0 if sueldo_mensual > 0 else 0.0
-val_hora_50 = val_hora_norm * 1.5   # 50% recargo suplementario
-val_hora_100 = val_hora_norm * 2.0  # 100% recargo extraordinario
+val_hora_50 = val_hora_norm * 1.5
+val_hora_100 = val_hora_norm * 2.0
 
 val_sup = hrs_50 * val_hora_50
 val_ext = hrs_100 * val_hora_100
@@ -303,7 +373,7 @@ iess_945 = ingresos_gravables * 0.0945
 # CÁLCULO AUTOMÁTICO DE CESANTÍA (2% de los ingresos gravables)
 cesantia = (ingresos_gravables * 0.02) if usar_cesantia_auto else cesantia_manual
 
-# Beneficios de Ley (Décimos y Fondos de Reserva)
+# Beneficios de Ley
 val_xiii = (ingresos_gravables / 12.0) if mensualizar_13 else 0.0
 val_xiv = (sbu_valor / 12.0) if mensualizar_14 else 0.0
 val_fr = (ingresos_gravables * (1.0 / 12.0)) if mensualizar_fr else 0.0
@@ -319,7 +389,7 @@ total_egresos = iess_945 + cesantia + otros_egresos_sum
 total_a_pagar = total_ingresos - total_egresos
 
 # ==========================================
-# 9. RESUMEN DE KPIS REORGANIZADOS
+# 10. RESUMEN DE KPIS REORGANIZADOS
 # ==========================================
 st.markdown("---")
 
@@ -441,7 +511,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 10. GRÁFICO Y TABLA DETALLADA
+# 11. GRÁFICO Y TABLA DETALLADA
 # ==========================================
 tab1, tab2 = st.tabs(["📊 Distribución de Ingresos y Descuentos", "📄 Detalle Rol de Pagos"])
 
