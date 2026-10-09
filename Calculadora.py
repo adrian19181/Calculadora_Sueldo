@@ -293,11 +293,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 5. FIX PARCHE MÓVIL (POPOVER / DROPDOWNS)
+# 5. FIX PARCHE MÓVIL (SOBRESCRIBIR DIRECTO AL ENFOCAR CASILLAS Y POPOVERS)
 # ==========================================
 components.html("""
 <script>
-document.addEventListener('click', function(e) {
+const doc = window.parent.document;
+
+// Cierre automático de popovers al cambiar
+doc.addEventListener('click', function(e) {
     var target = e.target;
     if (target.closest('[data-testid="stPopover"]') || target.closest('.stSelectbox')) {
         setTimeout(function() {
@@ -308,8 +311,17 @@ document.addEventListener('click', function(e) {
                 bubbles: true,
                 cancelable: true
             });
-            document.dispatchEvent(event);
+            doc.dispatchEvent(event);
         }, 120);
+    }
+});
+
+// Selección automática de texto para sobrescribir directamente al hacer clic/enfocar cualquier casilla
+doc.addEventListener('focusin', function(e) {
+    if (e.target && e.target.tagName === 'INPUT') {
+        setTimeout(function() {
+            e.target.select();
+        }, 30);
     }
 });
 </script>
