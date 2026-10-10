@@ -293,7 +293,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 5. FIX PARCHE MÓVIL (SOBRESCRIBIR DIRECTO AL ENFOCAR CASILLAS Y POPOVERS)
+# 5. FIX PARCHE MÓVIL (SOBRESCRIBIR DIRECTO Y CIERRE DE POPOVERS)
 # ==========================================
 components.html("""
 <script>
@@ -316,12 +316,10 @@ doc.addEventListener('click', function(e) {
     }
 });
 
-// Selección automática de texto para sobrescribir directamente al hacer clic/enfocar cualquier casilla
-doc.addEventListener('focusin', function(e) {
-    if (e.target && e.target.tagName === 'INPUT') {
-        setTimeout(function() {
-            e.target.select();
-        }, 30);
+// Seleccionar todo el texto de la casilla ÚNICAMENTE al hacer clic/tap manual sobre ella
+doc.addEventListener('click', function(e) {
+    if (e.target && e.target.tagName === 'INPUT' && (e.target.type === 'number' || e.target.type === 'text')) {
+        e.target.select();
     }
 });
 </script>
@@ -420,7 +418,7 @@ ingresos_gravables = max(0.0, (sueldo_ganado + total_he + bonos + comisiones) - 
 # Aporte IESS Personal 9.45%
 iess_945 = ingresos_gravables * 0.0945
 
-# CÁLCULO AUTOMÁTICO DE CESANTÍA (2% de los ingresos gravables)
+# CESANTÍA: DATO PURAMENTE INFORMATIVO (NO SE RESTA DEL NETO A RECIBIR)
 cesantia = (ingresos_gravables * 0.02) if usar_cesantia_auto else cesantia_manual
 
 # Beneficios de Ley
@@ -435,7 +433,9 @@ otros_egresos_sum = (
     prestamo_quiro + prestamo_hipo + multas + atrasos + 
     imp_renta + anticipos + consumos + pension_alim + ext_salud
 )
-total_egresos = iess_945 + cesantia + otros_egresos_sum
+
+# TOTAL EGRESOS NO INCLUYE CESANTÍA
+total_egresos = iess_945 + otros_egresos_sum
 total_a_pagar = total_ingresos - total_egresos
 
 # ==========================================
@@ -542,7 +542,7 @@ with k_col9:
 with k_col10:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="title">Cesantía (2%)</div>
+        <div class="title">Cesantía (2%) (Informativo)</div>
         <div class="value text-rose">${cesantia:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -574,9 +574,9 @@ with tab1:
     values_chart = [max(0.0, total_a_pagar), iess_945]
     colors_chart = ["#00E676", "#F472B6"]
     
-    if (cesantia + otros_egresos_sum) > 0:
+    if otros_egresos_sum > 0:
         labels_chart.append("Otros Egresos")
-        values_chart.append(cesantia + otros_egresos_sum)
+        values_chart.append(otros_egresos_sum)
         colors_chart.append("#FBBF24")
 
     pct_iess_real = (iess_945 / total_ingresos * 100) if total_ingresos > 0 else 0.0
@@ -640,7 +640,7 @@ with tab2:
     st.markdown("<h5 style='color: #F472B6;'>🔴 Egresos</h5>", unsafe_allow_html=True)
     df_e = pd.DataFrame([
         {"Concepto": "Aporte IESS 9.45%", "Valor ($)": iess_945},
-        {"Concepto": "Cesantía (2%)", "Valor ($)": cesantia},
+        {"Concepto": "Cesantía (2%) (Informativo)", "Valor ($)": cesantia},
         {"Concepto": "Préstamo Quirografario", "Valor ($)": prestamo_quiro},
         {"Concepto": "Préstamo Hipotecario", "Valor ($)": prestamo_hipo},
         {"Concepto": "Multas", "Valor ($)": multas},
@@ -650,3 +650,7 @@ with tab2:
         {"Concepto": "TOTAL EGRESOS", "Valor ($)": total_egresos},
     ])
     st.dataframe(df_e.style.format({"Valor ($)": "${:,.2f}"}), use_container_width=True, hide_index=True)
+
+if __name__ == "__main__":
+    if "streamlit" not in sys.argv[0]:
+        os.system(f'streamlit run "{__file__}" --server.port 8501')
