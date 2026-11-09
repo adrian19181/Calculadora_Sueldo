@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import os
+import datetime
 
 # ==========================================
 # 1. AUTO-LANZADOR PARA DOBLE CLIC EN WINDOWS
@@ -32,6 +33,7 @@ st.set_page_config(
 # ==========================================
 def init_states():
     defaults = {
+        "sbu_valor": 482.0,
         "sueldo_mensual": 900.0,
         "dias_trabajados": 30,
         "hrs_50": 0.0,
@@ -55,6 +57,7 @@ def init_states():
             st.session_state[key] = val
 
 def reset_fields():
+    st.session_state["sbu_valor"] = 482.0
     st.session_state["sueldo_mensual"] = 900.0
     st.session_state["dias_trabajados"] = 30
     st.session_state["hrs_50"] = 0.0
@@ -343,6 +346,23 @@ with col_btn2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
+# --- RECUADRO Y KPI DE SBU CON FECHA ACTUAL ---
+fecha_actual_str = datetime.date.today().strftime('%d/%m/%Y')
+
+col_sbu1, col_sbu2 = st.columns(2)
+with col_sbu1:
+    sbu_valor = st.number_input("SBU Vigente ($)", min_value=0.0, key="sbu_valor", step=1.0, format="%.2f")
+
+with col_sbu2:
+    st.markdown(f"""
+    <div class="kpi-card" style="margin-top: 2px;">
+        <div class="title">SBU ({fecha_actual_str})</div>
+        <div class="value text-amber">${sbu_valor:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
 # ==========================================
 # 7. SECCIÓN 1: RECUADRO DE INGRESOS
 # ==========================================
@@ -397,7 +417,6 @@ with st.expander("🎁 Beneficios de Ley (Mensualización de Décimos y F. Reser
         mensualizar_fr = st.checkbox("F. Reserva (8.33%)", value=True)
     with col_b2:
         mensualizar_14 = st.checkbox("XIV Mensual", value=True)
-        sbu_valor = st.number_input("SBU ($)", value=482.0, step=1.0)
 
 # ==========================================
 # 9. MOTOR DE CÁLCULO FINANCIERO Y FÓRMULAS
