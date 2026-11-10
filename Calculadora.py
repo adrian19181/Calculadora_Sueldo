@@ -2,31 +2,130 @@ import sys
 import subprocess
 import os
 import datetime
-
-# ==========================================
-# 1. AUTO-LANZADOR PARA DOBLE CLIC EN WINDOWS
-# ==========================================
-if __name__ == "__main__":
-    import streamlit as st
-    if not st.runtime.exists():
-        file_path = os.path.abspath(__file__)
-        subprocess.run([sys.executable, "-m", "streamlit", "run", file_path])
-        sys.exit(0)
-
+import io
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 import streamlit.components.v1 as components
 
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+
+# ==========================================
+# 1. AUTO-LANZADOR PARA DOBLE CLIC EN WINDOWS
+# ==========================================
+if __name__ == "__main__":
+    if not st.runtime.exists():
+        file_path = os.path.abspath(__file__)
+        subprocess.run([sys.executable, "-m", "streamlit", "run", file_path])
+        sys.exit(0)
+
 # ==========================================
 # 2. CONFIGURACIÓN DE PÁGINA
 # ==========================================
 st.set_page_config(
-    page_title="Sueldo Mes",
+    page_title="Calculadora sueldo",
     page_icon="💰",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# ==========================================
+# FUNCIÓN GENERADORA DE PDF CACHEADA
+# ==========================================
+@st.cache_data(ttl=600)
+def generar_pdf_reporte_cached(datos_parametros, datos_ingresos, datos_egresos, datos_resumen):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30
+    )
+    story = []
+    styles = getSampleStyleSheet()
+
+    style_title = ParagraphStyle('DocTitle', parent=styles['Heading1'], fontSize=16, leading=18, textColor=colors.HexColor('#1F2937'), spaceAfter=4)
+    style_sub = ParagraphStyle('DocSub', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#4B5563'), spaceAfter=10)
+    style_h2 = ParagraphStyle('DocH2', parent=styles['Heading2'], fontSize=11, leading=13, textColor=colors.HexColor('#1E3A8A'), spaceBefore=8, spaceAfter=4)
+    style_cell = ParagraphStyle('DocCell', parent=styles['Normal'], fontSize=8, leading=10, textColor=colors.HexColor('#000000'))
+    style_cell_bold = ParagraphStyle('DocCellBold', parent=style_cell, fontName='Helvetica-Bold')
+    style_cell_header = ParagraphStyle('DocCellHeader', parent=style_cell, fontName='Helvetica-Bold', textColor=colors.white, alignment=1)
+
+    fecha_hoy = datetime.date.today().strftime('%d/%m/%Y')
+    story.append(Paragraph("🧮 Rol de Pagos - Calculadora sueldo", style_title))
+    story.append(Paragraph(f"Reporte Consolidado de Ingresos, Egresos y Neto a Recibir | Fecha: {fecha_hoy}", style_sub))
+
+    # 1. PARÁMETROS GENERALES
+    story.append(Paragraph("📋 1. Parámetros Generales", style_h2))
+    t_param_data = [[Paragraph("Parámetro", style_cell_header), Paragraph("Valor", style_cell_header)]]
+    for k, v in datos_parametros:
+        t_param_data.append([Paragraph(str(k), style_cell_bold), Paragraph(str(v), style_cell)])
+    t_param = Table(t_param_data, colWidths=[220, 332])
+    t_param.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1F2937')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+    ]))
+    story.append(t_param)
+    story.append(Spacer(1, 8))
+
+    # 2. DETALLE DE INGRESOS
+    story.append(Paragraph("🟢 2. Detalle de Ingresos", style_h2))
+    t_ing_data = [[Paragraph("Concepto de Ingreso", style_cell_header), Paragraph("Valor ($)", style_cell_header)]]
+    for k, v in datos_ingresos:
+        t_ing_data.append([Paragraph(str(k), style_cell_bold), Paragraph(str(v), style_cell)])
+    t_ing = Table(t_ing_data, colWidths=[300, 252])
+    t_ing.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#059669')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+    ]))
+    story.append(t_ing)
+    story.append(Spacer(1, 8))
+
+    # 3. DETALLE DE EGRESOS
+    story.append(Paragraph("🔴 3. Detalle de Egresos y Descuentos", style_h2))
+    t_egr_data = [[Paragraph("Concepto de Egreso", style_cell_header), Paragraph("Valor ($)", style_cell_header)]]
+    for k, v in datos_egresos:
+        t_egr_data.append([Paragraph(str(k), style_cell_bold), Paragraph(str(v), style_cell)])
+    t_egr = Table(t_egr_data, colWidths=[300, 252])
+    t_egr.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#DC2626')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+    ]))
+    story.append(t_egr)
+    story.append(Spacer(1, 8))
+
+    # 4. RESUMEN FINAL
+    story.append(Paragraph("💵 4. Resumen y Total Neto a Recibir", style_h2))
+    t_res_data = [[Paragraph("Métrica / Indicador", style_cell_header), Paragraph("Monto Total", style_cell_header)]]
+    for k, v in datos_resumen:
+        t_res_data.append([Paragraph(str(k), style_cell_bold), Paragraph(str(v), style_cell_bold if "NETO" in str(k) else style_cell)])
+    t_res = Table(t_res_data, colWidths=[300, 252])
+    t_res.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E3A8A')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#000000')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+    ]))
+    story.append(t_res)
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
 
 # ==========================================
 # 3. MANEJO DE ESTADO (RESET / VALORES INICIALES)
@@ -134,7 +233,7 @@ st.markdown("""
         border-radius: 6px !important;
     }
 
-    /* FORZAR 2 COLUMNAS COMPACTAS AJUSTADAS EXACTAMENTE AL ANCHO DEL MÓVIL */
+    /* FORZAR COLUMNAS COMPACTAS AJUSTADAS EXACTAMENTE AL ANCHO DEL MÓVIL */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
@@ -145,9 +244,9 @@ st.markdown("""
     }
     
     [data-testid="column"] {
-        flex: 1 1 50% !important;
-        width: 50% !important;
-        max-width: 50% !important;
+        flex: 1 1 33.33% !important;
+        width: 33.33% !important;
+        max-width: 33.33% !important;
         min-width: 0 !important;
         overflow: hidden !important;
     }
@@ -164,7 +263,7 @@ st.markdown("""
     }
 
     /* BOTONES COMPACTOS DE CABECERA */
-    .stButton > button {
+    .stButton > button, .stDownloadButton > button {
         padding: 0.35rem 0.2rem !important;
         font-size: 0.78rem !important;
         font-weight: 700 !important;
@@ -329,18 +428,18 @@ doc.addEventListener('click', function(e) {
 """, height=0, width=0)
 
 # ==========================================
-# 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
+# 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET / PDF)
 # ==========================================
-st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Sueldo Mes</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Calculadora sueldo</h3>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.75rem; margin-bottom: 8px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
 
-col_btn1, col_btn2 = st.columns(2)
+col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
 with col_btn1:
     if st.button("🔄 Refrescar", use_container_width=True):
         st.rerun()
 
 with col_btn2:
-    if st.button("🧹 Reset / Limpiar", use_container_width=True):
+    if st.button("🧹 Reset", use_container_width=True):
         reset_fields()
         st.rerun()
 
@@ -456,6 +555,66 @@ otros_egresos_sum = (
 # TOTAL EGRESOS NO INCLUYE CESANTÍA
 total_egresos = iess_945 + otros_egresos_sum
 total_a_pagar = total_ingresos - total_egresos
+
+# ==========================================
+# EXPORTACIÓN PDF OPTIMIZADA CON CACHÉ
+# ==========================================
+datos_pdf_parametros = (
+    ("SBU Vigente", f"${sbu_valor:,.2f}"),
+    ("Sueldo Base Mensual", f"${sueldo_mensual:,.2f}"),
+    ("Días Trabajados", str(dias_trabajados)),
+    ("Horas Suplementarias (50%)", f"{hrs_50:.1f} hs"),
+    ("Horas Extraordinarias (100%)", f"{hrs_100:.1f} hs"),
+    ("Horas a Descontar", f"{hrs_descontar:.1f} hs")
+)
+
+datos_pdf_ingresos = (
+    ("Sueldo Ganado", f"${sueldo_ganado:,.2f}"),
+    ("Horas Suplementarias 50%", f"${val_sup:,.2f}"),
+    ("Horas Extraordinarias 100%", f"${val_ext:,.2f}"),
+    ("Bonos", f"${bonos:,.2f}"),
+    ("Comisiones", f"${comisiones:,.2f}"),
+    ("(-) Descuento por Horas", f"-${val_descuento_horas:,.2f}"),
+    ("TOTAL INGRESOS GRAVABLES", f"${ingresos_gravables:,.2f}"),
+    ("XIII Mensual", f"${val_xiii:,.2f}"),
+    ("XIV Mensual", f"${val_xiv:,.2f}"),
+    ("Fondos de Reserva (8.33%)", f"${val_fr:,.2f}"),
+    ("TOTAL INGRESOS", f"${total_ingresos:,.2f}")
+)
+
+datos_pdf_egresos = (
+    ("Aporte IESS 9.45%", f"${iess_945:,.2f}"),
+    ("Cesantía (2%) (Informativo)", f"${cesantia:,.2f}"),
+    ("Préstamo Quirografario", f"${prestamo_quiro:,.2f}"),
+    ("Préstamo Hipotecario", f"${prestamo_hipo:,.2f}"),
+    ("Multas", f"${multas:,.2f}"),
+    ("Atrasos", f"${atrasos:,.2f}"),
+    ("Impuesto a la Renta", f"${imp_renta:,.2f}"),
+    ("Otros (Anticipos/Consumos/Salud)", f"${anticipos + consumos + pension_alim + ext_salud:,.2f}"),
+    ("TOTAL EGRESOS", f"${total_egresos:,.2f}")
+)
+
+datos_pdf_resumen = (
+    ("Total Ingresos", f"${total_ingresos:,.2f}"),
+    ("Total Egresos", f"${total_egresos:,.2f}"),
+    ("TOTAL NETO A RECIBIR", f"${total_a_pagar:,.2f}")
+)
+
+pdf_bytes = generar_pdf_reporte_cached(
+    datos_pdf_parametros,
+    datos_pdf_ingresos,
+    datos_pdf_egresos,
+    datos_pdf_resumen
+)
+
+with col_btn3:
+    st.download_button(
+        label="📄 PDF",
+        data=pdf_bytes,
+        file_name="Calculadora_Sueldo.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
 
 # ==========================================
 # 10. RESUMEN DE KPIS ORGANIZADOS EN 2 COLUMNAS EN MÓVIL
