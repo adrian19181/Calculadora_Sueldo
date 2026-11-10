@@ -22,7 +22,7 @@ import streamlit.components.v1 as components
 # 2. CONFIGURACIÓN DE PÁGINA
 # ==========================================
 st.set_page_config(
-    page_title="Calculadora de Sueldo Ecuador",
+    page_title="Sueldo Mes",
     page_icon="💰",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -331,7 +331,7 @@ doc.addEventListener('click', function(e) {
 # ==========================================
 # 6. ENCABEZADO Y BOTONES SUPERIORES (REFRESCAR / RESET)
 # ==========================================
-st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Calculadora de Sueldo</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #38BDF8; font-weight: 800; margin-bottom: 2px; font-size: 1.25rem;'>🧮 Sueldo Mes</h3>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 0.75rem; margin-bottom: 8px;'>Simulador Interactivo (Normativa Ecuador)</p>", unsafe_allow_html=True)
 
 col_btn1, col_btn2 = st.columns(2)
